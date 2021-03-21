@@ -12,11 +12,8 @@ package git.snippet.spider;
  * http://www.informatik.uni-trier.de/~ley/db/conf/cvpr/index.html
  */
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static git.snippet.spider.Conference.*;
+import static git.snippet.spider.Conference.values;
+import static java.util.Arrays.stream;
 
 /**
  * @author <a href="mailto:410486047@qq.com">Grey</a>
@@ -24,40 +21,22 @@ import static git.snippet.spider.Conference.*;
  * @since
  */
 public class App {
-    private static final Map<Conference, String> MAP = new HashMap<>();
 
-    static {
-        MAP.put(ECCV, "http://www.informatik.uni-trier.de/~ley/db/conf/eccv/index.html");
-        MAP.put(ICCV, "http://www.informatik.uni-trier.de/~ley/db/conf/iccv/index.html");
-        MAP.put(CVPR, "http://www.informatik.uni-trier.de/~ley/db/conf/cvpr/index.html");
+
+    public static void main(String[] args) {
+        stream(values()).forEach(conference -> {
+            Class<? extends Processor> clazz = conference.getProcessor();
+            String url = conference.getUrl();
+            try {
+                handle(clazz, url);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    public static void main(String[] args) throws Exception {
-        Set<Map.Entry<Conference, String>> entries = MAP.entrySet();
-        for (Map.Entry<Conference, String> entry : entries) {
-            Conference key = entry.getKey();
-            String url = entry.getValue();
-            handle(key, url);
-        }
-    }
-
-    private static void handle(Conference key, String url) throws Exception {
-        Processor processor = null;
-        switch (key) {
-            case ECCV:
-                processor = new ECCVProcessor();
-                break;
-            case ICCV:
-                processor = new ICCVProcessor();
-                break;
-            case CVPR:
-                processor = new CVPRProcessor();
-                break;
-            default:
-                System.out.println("没有找到合适的爬虫");
-                break;
-        }
-
+    private static void handle(Class<? extends Processor> clazz, String url) throws Exception {
+        Processor processor = clazz.getDeclaredConstructor().newInstance();
         processor.save(processor.fetch(url));
     }
 }

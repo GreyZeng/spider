@@ -131,10 +131,6 @@ public interface Processor {
         List<String> urlByYears = new ArrayList<>();
         for (Element element : selects) {
             String href = element.attr("href");
-            if (href.contains("eccv2020") || href.contains("eccv2018") || href.contains("eccv2016")) {
-                System.out.println("eccv暂时先不抓取2020，2018，2016的数据 " + href);
-                continue;
-            }
             System.out.println("每年的链接 " + href);
             urlByYears.add(href);
         }
