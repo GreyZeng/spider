@@ -12,6 +12,8 @@ package git.snippet.spider;
  * http://www.informatik.uni-trier.de/~ley/db/conf/cvpr/index.html
  */
 
+import java.util.concurrent.CompletableFuture;
+
 import static git.snippet.spider.Conference.values;
 import static java.util.Arrays.stream;
 
@@ -24,15 +26,27 @@ public class App {
 
 
     public static void main(String[] args) {
-        stream(values()).forEach(conference -> {
-            Class<? extends Processor> clazz = conference.getProcessor();
-            String url = conference.getUrl();
+        CompletableFuture<Void> p1 = CompletableFuture.runAsync(new Job(Conference.ICCV));
+        CompletableFuture<Void> p2 = CompletableFuture.runAsync(new Job(Conference.CVPR));
+        CompletableFuture<Void> p3 = CompletableFuture.runAsync(new Job(Conference.ECCV));
+        CompletableFuture.allOf(p1, p2, p3).join();
+    }
+
+    private static class Job implements Runnable {
+        private Conference conference;
+
+        Job(Conference conference) {
+            this.conference = conference;
+        }
+
+        @Override
+        public void run() {
             try {
-                handle(clazz, url);
+                handle(conference.getProcessor(), conference.getUrl());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }
     }
 
     private static void handle(Class<? extends Processor> clazz, String url) throws Exception {
