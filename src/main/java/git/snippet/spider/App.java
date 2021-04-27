@@ -14,9 +14,6 @@ package git.snippet.spider;
 
 import java.util.concurrent.CompletableFuture;
 
-import static git.snippet.spider.Conference.values;
-import static java.util.Arrays.stream;
-
 /**
  * @author <a href="mailto:410486047@qq.com">Grey</a>
  * @date 2021/3/19
