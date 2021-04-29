@@ -23,10 +23,13 @@ public class App {
 
 
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         CompletableFuture<Void> p1 = CompletableFuture.runAsync(new Job(Conference.ICCV));
         CompletableFuture<Void> p2 = CompletableFuture.runAsync(new Job(Conference.CVPR));
         CompletableFuture<Void> p3 = CompletableFuture.runAsync(new Job(Conference.ECCV));
         CompletableFuture.allOf(p1, p2, p3).join();
+        long end = System.currentTimeMillis();
+        System.out.println("执行完毕，执行耗时(ms)" + (end - start));
     }
 
     private static class Job implements Runnable {
